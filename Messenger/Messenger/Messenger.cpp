@@ -8,11 +8,11 @@
 #include <sstream>
 #include <ctime>
 #include <algorithm>
+#include <thread>
 #include "network.h"
 #include "protocol.h"
 #include "ssh_deploy.h"
 #pragma comment(lib, "comctl32.lib")
-#include "Messenger.rc"
 
 #define DT_WORD_ELL 0x00040000L
 #define ODS_HOT_CUSTOM 0x00000040L
