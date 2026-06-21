@@ -8,11 +8,11 @@
 #include <sstream>
 #include <ctime>
 #include <algorithm>
+#include <thread>
 #include "network.h"
 #include "protocol.h"
 #include "ssh_deploy.h"
 #pragma comment(lib, "comctl32.lib")
-#include "Messenger.rc"
 
 #define DT_WORD_ELL 0x00040000L
 #define ODS_HOT_CUSTOM 0x00000040L
@@ -401,7 +401,7 @@ void reqHist(const std::string& who) {
 void sendMsg(const std::string& text) {
     if (!g_loggedIn || g_currentChat.empty() || text.empty()) return;
     std::vector<std::string> args; args.push_back(g_currentUser); args.push_back(g_currentChat); args.push_back(text);
-    std::string r = Protocol::createMessage(Protocol::MSG, args);
+    std::string r = Protocol::createMessage(Protocol::MESSAGE, args);
     if (g_net.sendMessage(r)) {
         ChatMsg m; m.sender = g_currentUser; m.text = text; m.time = curTime(); m.isSelf = true;
         g_messages.push_back(m);
@@ -758,7 +758,8 @@ int APIENTRY wWinMain(HINSTANCE hi, HINSTANCE, LPWSTR, int show) {
     g_hMsgView = CreateWindowEx(0, L"MessengerMsgView", L"", WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, cX, CHAT_HEADER_H, cW, cH - CHAT_HEADER_H - INPUT_AREA_H, g_hMain, NULL, hi, NULL);
     g_hMsgInput = CreateWindow(L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER | ES_AUTOHSCROLL | ES_MULTILINE, cX, mY, cW - SEND_BTN_W - 4, INPUT_AREA_H - 4, g_hMain, (HMENU)ID_MSG_INPUT, hi, NULL); SendMessage(g_hMsgInput, WM_SETFONT, (WPARAM)g_fontMain, TRUE);
     HFONT hFontArrow = CreateFont(22, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI Symbol");
-    g_hSendBtn = CreateWindow(L"BUTTON", L" ", WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | BS_PUSHBUTTON, cX + cW - SEND_BTN_W, mY, SEND_BTN_W, INPUT_AREA_H - 4, g_hMain, (HMENU)ID_SEND_BTN, hi, NULL); SendMessage(g_hSendBtn, WM_SETFONT, (WPARAM)hFontArrow, TRUE); DeleteObject(hFontArrow);
+    g_hSendBtn = CreateWindow(L"BUTTON", L" ", WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | BS_PUSHBUTTON, cX + cW - SEND_BTN_W, mY, SEND_BTN_W, INPUT_AREA_H - 4, g_hMain, (HMENU)ID_SEND_BTN, hi, NULL); SendMessage(g_hSendBtn, WM_SETFONT, (WPARAM)hFontArrow, TRUE);
+    DeleteObject(hFontArrow);
     g_hStatusTxt = CreateWindow(L"STATIC", L"Не подключено", WS_CHILD | WS_VISIBLE | SS_LEFT, 0, wh - 28, ww, 28, g_hMain, NULL, hi, NULL); SendMessage(g_hStatusTxt, WM_SETFONT, (WPARAM)g_fontTiny, TRUE);
     EnableWindow(g_hMsgInput, FALSE); EnableWindow(g_hSendBtn, FALSE);
     ShowWindow(g_hMain, show); UpdateWindow(g_hMain);
